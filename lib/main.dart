@@ -52,7 +52,7 @@ class _OrderScreenState extends State<OrderScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return const Placeholder()
+    return const Placeholder();
   }
 }
 
