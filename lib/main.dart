@@ -44,6 +44,9 @@ class _OrderScreenState extends State<OrderScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final bool canAdd = _quantity < widget.maxQuantity;
+    final bool canRemove = _quantity > 0;
+    
     return Scaffold(
       appBar: AppBar(
         title: const Text('Sandwich Counter'),
@@ -62,12 +65,12 @@ class _OrderScreenState extends State<OrderScreen> {
                 StyledButton(
                   label: 'Add',
                   color: Colors.green,
-                  onPressed: _increaseQuantity,
+                  onPressed: canAdd ? _increaseQuantity : null,
                 ),
                 StyledButton(
                   label: 'Remove',
                   color: Colors.red,
-                  onPressed: _decreaseQuantity,
+                  onPressed: canRemove ? _decreaseQuantity : null,
                 ),
               ],
             ),
@@ -82,7 +85,7 @@ class _OrderScreenState extends State<OrderScreen> {
 class StyledButton extends StatelessWidget {
   final String label;
   final Color color;
-  final VoidCallback onPressed;
+  final VoidCallback? onPressed;
 
   const StyledButton({
     super.key,
@@ -99,6 +102,8 @@ class StyledButton extends StatelessWidget {
         style: ElevatedButton.styleFrom(
           backgroundColor: color,
           foregroundColor: Colors.white,
+          disabledBackgroundColor: Colors.grey,
+          disabledForegroundColor: Colors.white,
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         ),
         onPressed: onPressed,
