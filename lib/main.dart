@@ -29,6 +29,7 @@ class OrderScreen extends StatefulWidget{
 
 class _OrderScreenState extends State<OrderScreen> {
   int _quantity = 0;
+  String _note = '';
 
   void _increaseQuantity() {
     if (_quantity < widget.maxQuantity) {
@@ -42,6 +43,11 @@ class _OrderScreenState extends State<OrderScreen> {
     }
   }
 
+  void _updateNote(String value) {
+    setState(() => _note = value);
+    debugPrint('Note updated: $_note');
+  }
+
   @override
   Widget build(BuildContext context) {
     final bool canAdd = _quantity < widget.maxQuantity;
@@ -52,29 +58,39 @@ class _OrderScreenState extends State<OrderScreen> {
         title: const Text('Sandwich Counter'),
       ),
       body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            OrderItemDisplay(
-              _quantity,
-              'Footlong',
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                StyledButton(
-                  label: 'Add',
-                  color: Colors.green,
-                  onPressed: canAdd ? _increaseQuantity : null,
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              OrderItemDisplay(_quantity, 'Footlong'),
+              const SizedBox(height: 16),
+              TextField(
+                decoration: const InputDecoration(
+                  labelText: 'Add a note',
+                  hintText: 'e.g., no onions, extra pickles',
+                  border: OutlineInputBorder(),
                 ),
-                StyledButton(
-                  label: 'Remove',
-                  color: Colors.red,
-                  onPressed: canRemove ? _decreaseQuantity : null,
-                ),
-              ],
-            ),
-          ],
+                onChanged: _updateNote, 
+              ),
+              const SizedBox(height: 16),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  StyledButton(
+                    label: 'Add',
+                    color: Colors.green,
+                    onPressed: canAdd ? _increaseQuantity : null,
+                  ),
+                  StyledButton(
+                    label: 'Remove',
+                    color: Colors.red,
+                    onPressed: canRemove ? _decreaseQuantity : null,
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );
