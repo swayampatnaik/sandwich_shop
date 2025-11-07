@@ -69,7 +69,7 @@ class _OrderScreenState extends State<OrderScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              OrderItemDisplay(_quantity, 'Footlong'),
+              OrderItemDisplay(_quantity, _sandwichSize),
               const SizedBox(height: 16),
               
               SegmentedButton<String>(
