@@ -30,6 +30,7 @@ class OrderScreen extends StatefulWidget{
 class _OrderScreenState extends State<OrderScreen> {
   int _quantity = 0;
   String _note = '';
+  String _sandwichSize = 'Footlong';
 
   void _increaseQuantity() {
     if (_quantity < widget.maxQuantity) {
@@ -46,6 +47,11 @@ class _OrderScreenState extends State<OrderScreen> {
   void _updateNote(String value) {
     setState(() => _note = value);
     debugPrint('Note updated: $_note');
+  }
+
+  void _updateSandwichSize(String newSize) {
+    setState(() => _sandwichSize = newSize);
+    debugPrint('Sandwich size updated: $_sandwichSize');
   }
 
   @override
@@ -65,6 +71,24 @@ class _OrderScreenState extends State<OrderScreen> {
             children: [
               OrderItemDisplay(_quantity, 'Footlong'),
               const SizedBox(height: 16),
+              
+              SegmentedButton<String>(
+                segments: const [
+                  ButtonSegment<String>(
+                    value: 'Six-inch',
+                    label: Text('Six-inch'),
+                  ),
+                  ButtonSegment<String>(
+                    value: 'Footlong',
+                    label: Text('Footlong'),
+                  ),
+                ],
+                selected: {_sandwichSize},
+                onSelectionChanged: (Set<String> newSelection) {
+                  _updateSandwichSize(newSelection.first);
+                },
+              ),
+              
               TextField(
                 decoration: const InputDecoration(
                   labelText: 'Add a note',
@@ -74,6 +98,7 @@ class _OrderScreenState extends State<OrderScreen> {
                 onChanged: _updateNote, 
               ),
               const SizedBox(height: 16),
+              
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
