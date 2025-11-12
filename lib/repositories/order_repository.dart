@@ -9,7 +9,7 @@ class OrderRepository{
   bool get canIncrement => _quantity < maxQuantity;
   bool get canDecrement => _quantity > 0;
 
-  voidincremnt() {
+  voidincrement() {
     if (canIncrement) {
       _quantity++;
     }
