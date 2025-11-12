@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'app_styles.dart';
 
 void main() {
   runApp(const App());
@@ -76,11 +77,11 @@ class _OrderScreenState extends State<OrderScreen> {
                 segments: const [
                   ButtonSegment<String>(
                     value: 'Six-inch',
-                    label: Text('Six-inch'),
+                    label: Text('Six-inch', style: normalText),
                   ),
                   ButtonSegment<String>(
                     value: 'Footlong',
-                    label: Text('Footlong'),
+                    label: Text('Footlong', style: normalText),
                   ),
                 ],
                 selected: {_sandwichSize},
@@ -145,6 +146,7 @@ class StyledButton extends StatelessWidget {
           foregroundColor: Colors.white,
           disabledBackgroundColor: Colors.grey,
           disabledForegroundColor: Colors.white,
+          textStyle: normalText,
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         ),
         onPressed: onPressed,
