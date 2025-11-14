@@ -103,23 +103,23 @@ Users can choose sandwich size, select bread type, add a special-note, and incre
 
 # Dependencies
 
-    Flutter (Material)
-    No external third-party packages are required in the current code.
+    -Flutter (Material)
+    -No external third-party packages are required in the current code.
 
 
 # 🛠 KNOWN ISSUES / LIMITATIONS / ROADMAP
 
-    Size selector is implemented with a Switch. A SegmentedButton (requested UX preference) would provide a clearer explicit selection UI — planned enhancement.
-    Persistence: orders are in-memory only. Consider saving to local storage or a backend.
-    Accessibility: make sure semantic labels and contrast are validated if shipping to production.
-    Tests: add more unit tests for OrderRepository and additional widget tests for edge cases.
+    -Size selector is implemented with a Switch. A SegmentedButton (requested UX preference) would provide a clearer explicit selection UI — planned enhancement.
+    -Persistence: orders are in-memory only. Consider saving to local storage or a backend.
+    -Accessibility: make sure semantic labels and contrast are validated if shipping to production.
+    -Tests: add more unit tests for OrderRepository and additional widget tests for edge cases.
 
 
 # Contributing
 
-    Fork the repo, create a feature branch, open a pull request.
-    Keep changes small and focused; add/update tests for new behavior.
-    Follow existing code style and patterns.
+    -Fork the repo, create a feature branch, open a pull request.
+    -Keep changes small and focused; add/update tests for new behavior.
+    -Follow existing code style and patterns.
 
 
 # CONTACT
