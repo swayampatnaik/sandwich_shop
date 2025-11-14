@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:sandwich_shop/views/app_styles.dart';
+import 'package:sandwich_shop/repositories/pricing_repository.dart';
 import 'package:sandwich_shop/repositories/order_repository.dart';
 
 enum BreadType { white, wheat, wholemeal }
@@ -33,6 +34,7 @@ class OrderScreen extends StatefulWidget{
 
 class _OrderScreenState extends State<OrderScreen> {
   late final OrderRepository _orderRepository;
+  late final PricingRepository _pricingRepository;
   final TextEditingController _notesController = TextEditingController();
   bool _isFootlong = true;
   BreadType _selectedBreadType = BreadType.white;
@@ -42,6 +44,7 @@ class _OrderScreenState extends State<OrderScreen> {
   void initState() {
     super.initState();
     _orderRepository = OrderRepository(maxQuantity: widget.maxQuantity);
+    _pricingRepository = PricingRepository();
     _notesController.addListener(() {
       setState(() {});
     });
@@ -103,6 +106,12 @@ class _OrderScreenState extends State<OrderScreen> {
       noteForDisplay = _notesController.text;
     }
 
+    // calculate total price using the new repository
+    final double total = _pricingRepository.totalPrice(
+      _orderRepository.quantity,
+      isFootlong: _isFootlong,
+    );
+
     return Scaffold(
       appBar: AppBar(
         title: const Text(
@@ -112,14 +121,21 @@ class _OrderScreenState extends State<OrderScreen> {
       ),
       body: Center(
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
+          children: [
+            const SizedBox(height: 20),
             OrderItemDisplay(
               quantity: _orderRepository.quantity,
               itemType: sandwichType,
-              itemState: _isToasted ? 'toasted' : 'untoasted',
               breadType: _selectedBreadType,
               orderNote: noteForDisplay,
+              itemState: _isToasted ? 'toasted' : 'untoasted',
+            ),
+            const SizedBox(height: 8),
+            // display the total price
+            Text(
+              'Total: £${total.toStringAsFixed(2)}',
+              key: const Key('order_total_text'),
+              style: Theme.of(context).textTheme.titleMedium,
             ),
             const SizedBox(height: 20),
             Row(
