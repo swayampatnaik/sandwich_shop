@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:sandwich_shop/views/app_styles.dart';
 import 'package:sandwich_shop/models/sandwich.dart';
 import 'package:sandwich_shop/models/cart.dart';
+import 'package:sandwich_shop/repositories/pricing_repository.dart';
 
 
 void main() {
@@ -34,6 +35,8 @@ class OrderScreen extends StatefulWidget{
 class _OrderScreenState extends State<OrderScreen> {
   final Cart _cart = Cart();
   final TextEditingController _notesController = TextEditingController();
+  final PricingRepository _pricing = PricingRepository();
+  String _confirmationMessage = '';
 
   SandwichType _selectedSandwichType = SandwichType.veggieDelight;
   bool _isFootlong = true;
@@ -64,18 +67,10 @@ class _OrderScreenState extends State<OrderScreen> {
 
       setState(() {
         _cart.add(sandwich, _quantity); //add to cart check if it works
+        final line = _pricing.totalPrice(_quantity, isFootlong: _isFootlong);
+        _confirmationMessage =
+            'Added $_quantity ${_isFootlong ? 'footlong' : 'six-inch'} ${sandwich.name} (${sandwich.breadType.name}) — £${line.toStringAsFixed(2)}';
       });
-
-      String sizeText;
-      if (_isFootlong) {
-        sizeText = 'footlong';
-      } else {
-        sizeText = 'six-inch';
-      }
-      String confirmationMessage =
-          'Added $_quantity $sizeText ${sandwich.name} sandwich(es) on ${_selectedBreadType.name} bread to cart';
-
-      debugPrint(confirmationMessage);
     }
   }
 
@@ -249,6 +244,70 @@ class _OrderScreenState extends State<OrderScreen> {
                 icon: Icons.add_shopping_cart,
                 label: 'Add to Cart',
                 backgroundColor: Colors.green,
+              ),
+              const SizedBox(height: 12),
+              // Confirmation / last action message
+              if (_confirmationMessage.isNotEmpty)
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                  child: Text(
+                    _confirmationMessage,
+                    key: const Key('confirmation_text'),
+                    style: normalText,
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+              const SizedBox(height: 12),
+              // Cart list
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 12.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    const Text('Cart', style: heading1),
+                    const SizedBox(height: 8),
+                    if (_cart.items.isEmpty)
+                      const Text('Cart is empty', style: normalText)
+                    else
+                      ListView.builder(
+                        key: const Key('cart_list'),
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        itemCount: _cart.items.length,
+                        itemBuilder: (context, index) {
+                          final item = _cart.items[index];
+                          final sizeLabel = item.sandwich.isFootlong ? 'footlong' : 'six-inch';
+                          final lineTotal = _pricing.totalPrice(item.quantity, isFootlong: item.sandwich.isFootlong);
+                          return Card(
+                            child: ListTile(
+                              title: Text(
+                                '${item.quantity} x ${item.sandwich.name} (${item.sandwich.breadType.name} • $sizeLabel)',
+                                style: normalText,
+                              ),
+                              subtitle: Text('£${lineTotal.toStringAsFixed(2)}'),
+                              trailing: IconButton(
+                                key: Key('remove_item_$index'),
+                                icon: const Icon(Icons.delete),
+                                onPressed: () {
+                                  setState(() {
+                                    _cart.remove(item.sandwich);
+                                  });
+                                },
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    const SizedBox(height: 12),
+                    // Cart total
+                    Text(
+                      'Total: £${_cart.totalPrice().toStringAsFixed(2)}',
+                      key: const Key('cart_total_text'),
+                      style: heading1,
+                    ),
+                    const SizedBox(height: 16),
+                  ],
+                ),
               ),
               const SizedBox(height: 20),
             ],
