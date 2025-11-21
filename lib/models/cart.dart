@@ -39,7 +39,7 @@ class Cart {
     }
   }
 
-  /// Remove a specific sandwich (all quantities). Returns true if removed.
+  // Remove a specific sandwich (all quantities). Returns true if removed.
   bool remove(Sandwich sandwich) {
     final idx = _items.indexWhere((i) => i.matches(sandwich));
     if (idx >= 0) {
@@ -49,8 +49,7 @@ class Cart {
     return false;
   }
 
-  /// Update quantity for the matching sandwich. If qty <= 0 the item is removed.
-  /// Returns true when an existing item was updated/removed, false if not found.
+  // Update quantity for the matching sandwich. If qty <= 0 the item is removed.
   bool updateQuantity(Sandwich sandwich, int qty) {
     final idx = _items.indexWhere((i) => i.matches(sandwich));
     if (idx < 0) return false;
@@ -62,13 +61,13 @@ class Cart {
     return true;
   }
 
-  /// Remove item at a given index. Throws RangeError if index invalid.
+  // Remove item at a given index. Throws RangeError if index invalid.
   void removeAt(int index) => _items.removeAt(index);
 
-  /// Clear cart
+  // Clear cart
   void clear() => _items.clear();
 
-  /// Total price across all items using the PricingRepository
+  // Total price across all items using the PricingRepository
   double totalPrice() {
     return _items.fold(0.0, (sum, item) => sum + item.lineTotal(_pricing));
   }
