@@ -1,74 +1,66 @@
-import 'package:sandwich_shop/models/sandwich.dart';
+import 'sandwich.dart';
 import 'package:sandwich_shop/repositories/pricing_repository.dart';
 
-class CartItem {
-  final Sandwich sandwich;
-  int quantity;
-
-  CartItem({
-    required this.sandwich,
-    required this.quantity,
-  });
-
-  double lineTotal(PricingRepository pricing) {
-    return pricing.totalPrice(quantity, isFootlong: sandwich.isFootlong);
-  }
-
-  bool matches(Sandwich other) {
-    return sandwich.type == other.type &&
-        sandwich.isFootlong == other.isFootlong &&
-        sandwich.breadType == other.breadType;
-  }
-}
-
 class Cart {
-  final PricingRepository _pricing;
-  final List<CartItem> _items = [];
+  final Map<Sandwich, int> _items = {};
 
-  Cart({PricingRepository? pricing}) : _pricing = pricing ?? PricingRepository();
+  // Returns a read-only copy of the items and their quantities
+  Map<Sandwich, int> get items => Map.unmodifiable(_items);
 
-  List<CartItem> get items => List.unmodifiable(_items);
-
-  void add(Sandwich sandwich, [int qty = 1]) {
-    if (qty <= 0) return;
-    final existing = _items.indexWhere((i) => i.matches(sandwich));
-    if (existing >= 0) {
-      _items[existing].quantity += qty;
+  void add(Sandwich sandwich, {int quantity = 1}) {
+    if (_items.containsKey(sandwich)) {
+      _items[sandwich] = _items[sandwich]! + quantity;
     } else {
-      _items.add(CartItem(sandwich: sandwich, quantity: qty));
+      _items[sandwich] = quantity;
     }
   }
 
-  // Remove a specific sandwich (all quantities). Returns true if removed.
-  bool remove(Sandwich sandwich) {
-    final idx = _items.indexWhere((i) => i.matches(sandwich));
-    if (idx >= 0) {
-      _items.removeAt(idx);
-      return true;
+  void remove(Sandwich sandwich, {int quantity = 1}) {
+    if (_items.containsKey(sandwich)) {
+      final currentQty = _items[sandwich]!;
+      if (currentQty > quantity) {
+        _items[sandwich] = currentQty - quantity;
+      } else {
+        _items.remove(sandwich);
+      }
     }
-    return false;
   }
 
-  // Update quantity for the matching sandwich. If qty <= 0 the item is removed.
-  bool updateQuantity(Sandwich sandwich, int qty) {
-    final idx = _items.indexWhere((i) => i.matches(sandwich));
-    if (idx < 0) return false;
-    if (qty <= 0) {
-      _items.removeAt(idx);
-    } else {
-      _items[idx].quantity = qty;
-    }
-    return true;
+  void clear() {
+    _items.clear();
   }
 
-  // Remove item at a given index. Throws RangeError if index invalid.
-  void removeAt(int index) => _items.removeAt(index);
+  double get totalPrice {
+    final pricingRepository = PricingRepository();
+    double total = 0.0;
 
-  // Clear cart
-  void clear() => _items.clear();
+    for (Sandwich sandwich in _items.keys) {
+      int quantity = _items[sandwich]!;
+      total += pricingRepository.calculatePrice(
+        quantity: quantity,
+        isFootlong: sandwich.isFootlong,
+      );
+    }
 
-  // Total price across all items using the PricingRepository
-  double totalPrice() {
-    return _items.fold(0.0, (sum, item) => sum + item.lineTotal(_pricing));
+    return total;
+  }
+
+  bool get isEmpty => _items.isEmpty;
+
+  int get length => _items.length;
+
+  int get countOfItems {
+    int total = 0;
+    for (Sandwich sandwich in _items.keys) {
+      total += _items[sandwich]!;
+    }
+    return total;
+  }
+
+  int getQuantity(Sandwich sandwich) {
+    if (_items.containsKey(sandwich)) {
+      return _items[sandwich]!;
+    }
+    return 0;
   }
 }
