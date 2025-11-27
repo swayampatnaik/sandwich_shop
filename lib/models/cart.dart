@@ -63,4 +63,12 @@ class Cart {
     }
     return 0;
   }
+
+  void incrementQuantity(Sandwich sandwich) {
+    add(sandwich, quantity: 1);
+  }
+
+  void decrementQuantity(Sandwich sandwich) {
+    remove(sandwich, quantity: 1);
+  }
 }
