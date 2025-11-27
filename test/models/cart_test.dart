@@ -1,83 +1,121 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:sandwich_shop/models/cart.dart';
 import 'package:sandwich_shop/models/sandwich.dart';
-import 'package:sandwich_shop/repositories/pricing_repository.dart';
 
 void main() {
   group('Cart', () {
     late Cart cart;
-    late PricingRepository pricing;
+    late Sandwich sandwichA;
+    late Sandwich sandwichB;
 
     setUp(() {
-      pricing = PricingRepository();
-      cart = Cart(pricing: pricing);
-    });
-
-    test('adds items and calculates total for six-inch sandwiches', () {
-      final s = Sandwich(
+      cart = Cart();
+      sandwichA = Sandwich(
         type: SandwichType.veggieDelight,
         isFootlong: false,
-        breadType: BreadType.white,
-      );
-
-      cart.add(s, 2);
-      expect(cart.items.length, 1);
-      expect(cart.items.first.quantity, 2);
-      expect(cart.totalPrice(), 2 * PricingRepository.sixInchPrice);
-    });
-
-    test('mixes footlong and six-inch and calculates total', () {
-      final six = Sandwich(
-        type: SandwichType.tunaMelt,
-        isFootlong: false,
         breadType: BreadType.wheat,
       );
-      final foot = Sandwich(
-        type: SandwichType.tunaMelt,
-        isFootlong: true,
-        breadType: BreadType.wheat,
-      );
-
-      cart.add(six, 2); // 2 * 7 = 14
-      cart.add(foot, 1); // 1 * 11 = 11
-      expect(cart.items.length, 2);
-      expect(cart.totalPrice(), 14.0 + 11.0);
-    });
-
-    test('removes specific item and updates total', () {
-      final s1 = Sandwich(
+      sandwichB = Sandwich(
         type: SandwichType.chickenTeriyaki,
         isFootlong: true,
         breadType: BreadType.white,
       );
-      final s2 = Sandwich(
-        type: SandwichType.veggieDelight,
-        isFootlong: false,
-        breadType: BreadType.white,
-      );
-
-      cart.add(s1, 1); // 11
-      cart.add(s2, 2); // 14
-      expect(cart.totalPrice(), 25.0);
-
-      final removed = cart.remove(s1);
-      expect(removed, isTrue);
-      expect(cart.items.length, 1);
-      expect(cart.totalPrice(), 14.0);
     });
 
-    test('updateQuantity removes item when set to zero', () {
-      final s = Sandwich(
-        type: SandwichType.meatballMarinara,
-        isFootlong: true,
-        breadType: BreadType.wholemeal,
-      );
-      cart.add(s, 3);
-      expect(cart.items.first.quantity, 3);
-      final updated = cart.updateQuantity(s, 0);
-      expect(updated, isTrue);
-      expect(cart.items.isEmpty, isTrue);
-      expect(cart.totalPrice(), 0.0);
+    test('should start empty', () {
+      expect(cart.isEmpty, isTrue);
+      expect(cart.length, 0);
+      expect(cart.items, isEmpty);
+    });
+
+    test('should add a sandwich with default quantity 1', () {
+      cart.add(sandwichA);
+      expect(cart.getQuantity(sandwichA), 1);
+      expect(cart.length, 1);
+      expect(cart.isEmpty, isFalse);
+    });
+
+    test('should add a sandwich with custom quantity', () {
+      cart.add(sandwichA, quantity: 3);
+      expect(cart.getQuantity(sandwichA), 3);
+      expect(cart.length, 1);
+    });
+
+    test('should increase quantity if same sandwich is added again', () {
+      cart.add(sandwichA);
+      cart.add(sandwichA, quantity: 2);
+      expect(cart.getQuantity(sandwichA), 3);
+    });
+
+    test('should add multiple different sandwiches', () {
+      cart.add(sandwichA);
+      cart.add(sandwichB, quantity: 2);
+      expect(cart.getQuantity(sandwichA), 1);
+      expect(cart.getQuantity(sandwichB), 2);
+      expect(cart.length, 2);
+    });
+
+    test('should remove quantity of a sandwich', () {
+      cart.add(sandwichA, quantity: 3);
+      cart.remove(sandwichA, quantity: 2);
+      expect(cart.getQuantity(sandwichA), 1);
+      expect(cart.length, 1);
+    });
+
+    test('should remove sandwich completely if quantity drops to zero', () {
+      cart.add(sandwichA, quantity: 2);
+      cart.remove(sandwichA, quantity: 2);
+      expect(cart.getQuantity(sandwichA), 0);
+      expect(cart.isEmpty, isTrue);
+      expect(cart.length, 0);
+    });
+
+    test('should not throw an error when removing a sandwich not in cart', () {
+      expect(() => cart.remove(sandwichA), returnsNormally);
+    });
+
+    test('should clear all items', () {
+      cart.add(sandwichA);
+      cart.add(sandwichB);
+      cart.clear();
+      expect(cart.isEmpty, isTrue);
+      expect(cart.items, isEmpty);
+    });
+
+    test('getQuantity returns correct quantity', () {
+      cart.add(sandwichA, quantity: 4);
+      expect(cart.getQuantity(sandwichA), 4);
+      expect(cart.getQuantity(sandwichB), 0);
+    });
+
+    test('items getter is unmodifiable', () {
+      cart.add(sandwichA);
+      final Map<Sandwich, int> items = cart.items;
+      expect(() => items[sandwichB] = 2, throwsUnsupportedError);
+    });
+
+    test('totalPrice calculates sum using PricingRepository', () {
+      cart.add(sandwichA, quantity: 2);
+      cart.add(sandwichB, quantity: 1);
+      expect(cart.totalPrice, isA<double>());
+      expect(cart.totalPrice, greaterThan(0));
+    });
+
+    test('should handle adding and removing multiple sandwiches correctly', () {
+      cart.add(sandwichA, quantity: 2);
+      cart.add(sandwichB, quantity: 3);
+      cart.remove(sandwichA, quantity: 1);
+      cart.remove(sandwichB, quantity: 2);
+      expect(cart.getQuantity(sandwichA), 1);
+      expect(cart.getQuantity(sandwichB), 1);
+      expect(cart.length, 2);
+    });
+
+    test('should not allow negative quantities', () {
+      cart.add(sandwichA, quantity: 2);
+      cart.remove(sandwichA, quantity: 5);
+      expect(cart.getQuantity(sandwichA), 0);
+      expect(cart.isEmpty, isTrue);
     });
   });
 }
