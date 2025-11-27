@@ -17,21 +17,30 @@ void main() {
       await tester.pumpWidget(const MaterialApp(
         home: OrderScreen(maxQuantity: 5),
       ));
+      // wait for layout/animations to finish
+      await tester.pumpAndSettle();
 
-      // Quantity starts at 1
-      expect(find.text("1"), findsOneWidget);
+      // quantity is shown inside a composed label like "1 white footlong..."
+      expect(find.textContaining('1 white'), findsOneWidget);
 
-      // Tap + icon
-      await tester.tap(find.byIcon(Icons.add));
-      await tester.pump();
+      // find the interactive IconButton widgets (safer than find.byIcon(Icon))
+      final addBtn = find.widgetWithIcon(IconButton, Icons.add);
+      final removeBtn = find.widgetWithIcon(IconButton, Icons.remove);
 
-      expect(find.text("2"), findsOneWidget);
+      // make sure the buttons are visible before tapping
+      await tester.ensureVisible(addBtn);
+      await tester.tap(addBtn);
+      await tester.pumpAndSettle();
 
-      // Tap - icon
-      await tester.tap(find.byIcon(Icons.remove));
-      await tester.pump();
+      // assert using textContaining to match the composed string
+      expect(find.textContaining('2 white'), findsOneWidget);
 
-      expect(find.text("1"), findsOneWidget);
+      // tap remove and confirm it goes back to 1
+      await tester.ensureVisible(removeBtn);
+      await tester.tap(removeBtn);
+      await tester.pumpAndSettle();
+
+      expect(find.textContaining('1 white'), findsOneWidget);
     });
 
     // testWidgets("Decrease button disabled at quantity = 0", (tester) async {
