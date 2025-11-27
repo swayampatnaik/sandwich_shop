@@ -1,12 +1,13 @@
 class PricingRepository {
-  static const double sixInchPrice = 7.0;
-  static const double footlongPrice = 11.0;
+  double calculatePrice({required int quantity, required bool isFootlong}) {
+    double price = 0.0;
 
-  PricingRepository();
+    if (isFootlong) {
+      price = 11.00;
+    } else {
+      price = 7.00;
+    }
 
-  double totalPrice(int quantity, {required bool isFootlong}) {
-    if (quantity <= 0) return 0.0;
-    final unit = isFootlong ? footlongPrice : sixInchPrice;
-    return unit * quantity;
+    return quantity * price;
   }
 }
