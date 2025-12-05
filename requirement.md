@@ -182,3 +182,39 @@ Keep PricingRepository as the single source of price truth.
 Prefer deterministic Keys rather than byType finders in tests.
 Make destructive actions reversible via Snackbar to reduce accidental data loss.
 Keep UI touch targets large and ensure elements are visible before attempting programmatic taps in tests (use tester.ensureVisible).
+
+14. Recent changes and added files
+
+Since this requirements document was created, the codebase has been updated with the following files and changes relevant to Cart Editing work and testability. Use these notes to guide next implementation steps and test updates.
+
+New screen: `lib/views/profile_screen.dart`
+    A simple profile form (Full name, Email, Phone) with a Save button that shows a SnackBar (no persistence yet).
+	Used by the app via a `Profile` button added to `OrderScreen`.
+	Widget tests were added for this screen (see test file below).
+
+Tests: `test/views/profile_screen_test.dart`
+	Widget tests that pump `ProfileScreen`, fill fields, tap Save and assert the SnackBar message for filled and empty name cases.
+	These tests run via the Flutter test runner and have passed locally.
+
+`pubspec.yaml` updated
+	Added `test` as a `dev_dependency` so `dart test` and `flutter test` can run the new unit/widget tests.
+
+Cart UI changes: `lib/views/cart_screen.dart`
+	Header row added above cart items with columns: `Product`, `Price`, `Quantity`, `Total` and dividers between rows.
+	Item rows reorganized into aligned columns showing product details, unit price, quantity controls, line total, and delete button.
+	Note: Keys (as defined in section 5) have not yet been attached to the new cart row widgets — see Next steps below.
+
+Order screen: `lib/views/order_screen.dart`
+	Imported and added navigation to `ProfileScreen` via a `Profile` button placed under the cart summary.
+
+Misc UI changes
+	Replaced an app-specific `PurpleButton` in a sign-in/profiles area with a standard `ElevatedButton` to simplify tests and styling.
+
+Notes & Next steps
+Attach the required deterministic Keys listed in section 5 to the cart widgets (tile containers, qty buttons/inputs, line prices, edit/remove actions, cart_total_text, confirmation_text, and undo_remove_action). Tests and acceptance criteria assume these Keys are present.
+Implement the Edit modal/bottom-sheet UI for editing sandwich attributes and ensure that edited items merge correctly following the identity rules in section 6.
+Add widget tests for cart flows (increment/decrement, edit+merge, remove+undo) using the Keys for deterministic finders.
+Ensure `PricingRepository` is used for per-line price calculations in the cart and that `Cart.totalPrice()` equals the sum of those per-line totals.
+Update README or developer notes to reflect `pubspec.yaml` dev dependency changes and how to run tests locally (e.g., `dart pub get` then `flutter test`).
+
+Status: profile screen tests passed locally; cart Keys and edit modal remain to be implemented and covered by tests.
