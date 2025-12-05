@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:sandwich_shop/views/app_styles.dart';
 import 'package:sandwich_shop/views/cart_screen.dart';
+import 'package:sandwich_shop/views/profile_screen.dart';
 import 'package:sandwich_shop/models/cart.dart';
 import 'package:sandwich_shop/models/sandwich.dart';
 
@@ -230,6 +231,20 @@ class _OrderScreenState extends State<OrderScreen> {
                 'Cart: ${_cart.countOfItems} items - £${_cart.totalPrice.toStringAsFixed(2)}',
                 style: normalText,
                 textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 20),
+              StyledButton(
+                onPressed: () {
+                  Navigator.push<void>(
+                    context,
+                    MaterialPageRoute<void>(
+                      builder: (BuildContext context) => const ProfileScreen(),
+                    ),
+                  );
+                },
+                icon: Icons.person,
+                label: 'Profile',
+                backgroundColor: Colors.purple,
               ),
               const SizedBox(height: 20),
             ],
