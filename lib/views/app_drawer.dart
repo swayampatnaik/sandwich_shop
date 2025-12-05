@@ -13,17 +13,24 @@ class AppDrawer extends StatelessWidget {
     // Close the drawer first
     Navigator.of(context).pop();
 
+    // If a caller supplied a custom handler, call it after the pop finishes.
     if (onNavigate != null) {
-      onNavigate!(route);
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        onNavigate!(route);
+      });
       return;
     }
 
     final String? current = ModalRoute.of(context)?.settings.name;
     if (current == route) return;
 
-    // Use pushReplacementNamed so the back stack is kept small for top-level
-    // navigation. This mirrors typical drawer behavior.
-    Navigator.of(context).pushReplacementNamed(route);
+    // Schedule the navigation after the current frame so we don't attempt to use
+    // a context that may have been disposed when the Drawer closed.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      // Use the root navigator to avoid using the Drawer/context that may be
+      // deactivated after Navigator.pop().
+      Navigator.of(context, rootNavigator: true).pushNamed(route);
+    });
   }
 
   Widget _buildTile(BuildContext context,
@@ -68,7 +75,7 @@ class AppDrawer extends StatelessWidget {
             ),
 
             // Primary navigation
-            _buildTile(context, icon: Icons.home, label: 'Order', route: '/'),
+            _buildTile(context, icon: Icons.home, label: 'Order', route: '/order'),
             _buildTile(context, icon: Icons.shopping_cart, label: 'Cart', route: '/cart'),
             _buildTile(context, icon: Icons.person, label: 'Profile', route: '/profile'),
 

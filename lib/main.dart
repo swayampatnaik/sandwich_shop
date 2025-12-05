@@ -15,14 +15,14 @@ class App extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Sandwich Shop App',
-      home: const OrderScreen(maxQuantity: 5),
+      title: 'Sandwich Shop',
+      initialRoute: '/order',
       routes: {
-        '/': (context) => const OrderScreen(maxQuantity: 5),
-        '/about': (context) => const AboutScreen(),
-        '/profile': (context) => const ProfileScreen(),
-        // provide a basic cart route (note: the runtime app-level cart is maintained on OrderScreen)
-        '/cart': (context) => CartScreen(cart: Cart()),
+        '/': (c) => const OrderScreen(), // optional
+        '/order': (c) => const OrderScreen(),
+        '/cart': (c) => CartScreen(cart: Cart()), // adapt as needed / or use provider
+        '/profile': (c) => const ProfileScreen(),
+        '/about': (c) => const AboutScreen(),
       },
     );
   }
