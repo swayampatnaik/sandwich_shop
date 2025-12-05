@@ -56,20 +56,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    SizedBox(
-                      height: 35,
-                      child: Image.network(
-                        'https://shop.upsu.net/cdn/shop/files/upsu_300x300.png?v=1614735854',
-                        fit: BoxFit.contain,
-                      ),
-                    ),
                     const SizedBox(height: 40),
-                    const Text('Sign in', style: heading2, textAlign: TextAlign.start),
+                    const Text('Sign in', style: heading2, textAlign: TextAlign.center),
                     const SizedBox(height: 10),
                     const Text(
                       'Enter your email to continue',
                       style: normalText,
-                      textAlign: TextAlign.start,
+                      textAlign: TextAlign.center,
                     ),
                     const SizedBox(height: 25),
                     SizedBox(
