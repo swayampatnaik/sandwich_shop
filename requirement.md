@@ -218,3 +218,31 @@ Ensure `PricingRepository` is used for per-line price calculations in the cart a
 Update README or developer notes to reflect `pubspec.yaml` dev dependency changes and how to run tests locally (e.g., `dart pub get` then `flutter test`).
 
 Status: profile screen tests passed locally; cart Keys and edit modal remain to be implemented and covered by tests.
+
+App navigation components (new files)
+
+The codebase recently introduced two navigation-focused widgets that centralize app navigation and make the UI responsive across screen widths. Below are concise notes for implementers and testers.
+
+`lib/views/app_drawer.dart` — AppDrawer
+Purpose: A reusable `Drawer` widget used for primary app navigation. The drawer contains top-level routes such as `'/`' (Order), `'/cart'` (Cart), `'/profile'` (Profile), and `'/about'` (About).
+API: `class AppDrawer extends StatelessWidget { final void Function(String route)? onNavigate; const AppDrawer({Key? key, this.onNavigate}); }`
+ `onNavigate`: optional callback invoked when an item is tapped. If provided, the drawer will call it instead of using Navigator directly. This allows parent widgets (for example `AppScaffold`) to handle navigation in a context-aware way (e.g., passing a shared `Cart` instance or showing the route in a side rail on wide screens).
+Behavior: Closes the drawer on tap, avoids re-navigating to the current route, and by default uses `Navigator.pushReplacementNamed` to replace the top-level route.
+Testing hints:
+Use widget tests that pump a `Scaffold` with `AppDrawer()` and assert that tapping an entry calls `onNavigate` when provided (supply a spy callback) or pushes a route when `onNavigate` is null.
+Ensure accessibility labels and semantic roles for each `ListTile` when adding localized text or semantics.
+
+`lib/views/app_scaffold.dart` — AppScaffold (responsive wrapper)
+Purpose: A small wrapper around `Scaffold` that centralizes the shared app chrome and makes navigation responsive.
+Behavior: Shows an in-drawer `AppDrawer` on narrow screens (mobile) and a persistent side navigation (a vertical rail/column) on wider screens. The current project uses a width threshold (approx. 800px) to switch between modes.
+Integration: Screens (Order, Cart, Profile, About, Checkout) use `AppScaffold(title: '...', body: ...)` so navigation and scaffolding style is consistent across the app.
+Navigation flow: When in wide mode, taps on navigation entries can be forwarded via `onNavigate` so the parent can decide how to show the destination (for example, swap the body content, or still call `Navigator`). When in narrow mode the drawer closes and normal route navigation is performed.
+Testing hints:
+Widget tests should verify both narrow and wide layouts by constraining the `MediaQuery`/`SurfaceSize` during the test and asserting whether a `Drawer` or a persistent side navigation is present.
+For route tests, supply a stub `onNavigate` to assert route strings instead of depending on `Navigator` behavior.
+
+Notes for next work items
+If the cart must be the canonical instance across the whole app (so Drawer -> Cart always opens the same `Cart`), consider lifting `Cart` state into a simple `InheritedWidget`/`Provider` or pass the instance into `AppScaffold` so `AppDrawer`'s `onNavigate` can forward it to the Cart route.
+When writing widget tests that navigate, prefer injecting `onNavigate` and testing navigation intent via that callback instead of depending on `Navigator` stack behavior; it's more deterministic in unit tests.
+
+Status: profile screen tests passed locally; navigation components documented above were added to the codebase and should be considered when writing cart-related widget tests.

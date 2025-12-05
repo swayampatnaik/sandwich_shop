@@ -68,7 +68,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ElevatedButton.icon(
                 onPressed: _saveProfile,
                 icon: const Icon(Icons.save),
-                label: Text('Save', style: const TextStyle(fontSize: 16)),
+                label: const Text('Save', style: TextStyle(fontSize: 16)),
               ),
               const SizedBox(height: 12),
               const Text(
