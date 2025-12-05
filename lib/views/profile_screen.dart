@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:sandwich_shop/views/app_styles.dart';
 
-
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
 
@@ -10,101 +9,75 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
-  late TextEditingController _emailController;
-  bool _canSubmit = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _emailController = TextEditingController();
-    _emailController.addListener(_updateCanSubmit);
-  }
-
-  void _updateCanSubmit() {
-    final hasText = _emailController.text.trim().isNotEmpty;
-    if (hasText != _canSubmit) {
-      setState(() => _canSubmit = hasText);
-    }
-  }
+  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _phoneController = TextEditingController();
 
   @override
   void dispose() {
-    _emailController.removeListener(_updateCanSubmit);
+    _nameController.dispose();
     _emailController.dispose();
+    _phoneController.dispose();
     super.dispose();
   }
 
-  void placeholderCallbackForButtons() {
-    // This is the event handler for buttons that don't work yet
+  void _saveProfile() {
+    final String name = _nameController.text.trim();
+    // final String email = _emailController.text.trim();
+    // final String phone = _phoneController.text.trim();
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Saved profile for ${name.isEmpty ? 'User' : name}'),
+        duration: const Duration(seconds: 2),
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
-      body: SingleChildScrollView(
-        // make the scrollable area at least the height of the viewport so we can center vertically
-        child: ConstrainedBox(
-          constraints: BoxConstraints(minHeight: MediaQuery.of(context).size.height),
-          child: Center(
-            // keep the same padded, constrained column but now centered vertically
-            child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 40.0, horizontal: 20.0),
-              child: ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 420),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    const SizedBox(height: 40),
-                    const Text('Sign in', style: heading2, textAlign: TextAlign.center),
-                    const SizedBox(height: 10),
-                    const Text(
-                      'Enter your email to continue',
-                      style: normalText,
-                      textAlign: TextAlign.center,
-                    ),
-                    const SizedBox(height: 25),
-                    SizedBox(
-                      height: 48,
-                      child: TextField(
-                        controller: _emailController,
-                        keyboardType: TextInputType.emailAddress,
-                        textInputAction: TextInputAction.done,
-                        decoration: const InputDecoration(
-                          hintText: 'Email address',
-                          border: OutlineInputBorder(),
-                          isDense: true,
-                          contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 15),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-
-                    // ElevatedButton that is disabled when the text field is empty
-                    SizedBox(
-                      height: 48,
-                      child: ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(4),
-                          ),
-                        ),
-                        onPressed: _canSubmit
-                            ? () {
-                                final email = _emailController.text.trim();
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(content: Text('Continue with: ${email.isEmpty ? '(empty)' : email}')),
-                                );
-                              }
-                            : null,
-                        child: const Text('Continue'),
-                      ),
-                    ),
-                  ],
-                ),
+      appBar: AppBar(
+        title: const Text('Profile', style: heading1),
+      ),
+      body: Center(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              TextFormField(
+                controller: _nameController,
+                decoration: const InputDecoration(labelText: 'Full name'),
+                style: normalText,
               ),
-            ),
+              const SizedBox(height: 12),
+              TextFormField(
+                controller: _emailController,
+                decoration: const InputDecoration(labelText: 'Email'),
+                keyboardType: TextInputType.emailAddress,
+                style: normalText,
+              ),
+              const SizedBox(height: 12),
+              TextFormField(
+                controller: _phoneController,
+                decoration: const InputDecoration(labelText: 'Phone'),
+                keyboardType: TextInputType.phone,
+                style: normalText,
+              ),
+              const SizedBox(height: 20),
+              ElevatedButton.icon(
+                onPressed: _saveProfile,
+                icon: const Icon(Icons.save),
+                label: Text('Save', style: const TextStyle(fontSize: 16)),
+              ),
+              const SizedBox(height: 12),
+              const Text(
+                'Note: This demo screen does not persist data yet.',
+                style: normalText,
+                textAlign: TextAlign.center,
+              ),
+            ],
           ),
         ),
       ),
