@@ -18,6 +18,7 @@ class App extends StatelessWidget {
       title: 'Sandwich Shop App',
       home: const OrderScreen(maxQuantity: 5),
       routes: {
+        '/': (context) => const OrderScreen(maxQuantity: 5),
         '/about': (context) => const AboutScreen(),
         '/profile': (context) => const ProfileScreen(),
         // provide a basic cart route (note: the runtime app-level cart is maintained on OrderScreen)
