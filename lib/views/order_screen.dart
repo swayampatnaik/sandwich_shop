@@ -41,8 +41,20 @@ class _OrderScreenState extends State<OrderScreen> {
   }
 
   Future<void> _navigateToProfile() async {
-    final Map<String, String>? result =
-        await Navigator.pushNamed<Map<String, String>>(context, '/profile');
+    debugPrint('Navigating to /profile');
+    Map<String, String>? result;
+    try {
+      final dynamic raw = await Navigator.pushNamed(context, '/profile');
+      result = raw as Map<String, String>?;
+    } catch (e, st) {
+      debugPrint('Navigation to /profile failed: $e');
+      debugPrint('$st');
+      // ignore: use_build_context_synchronously
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Failed to open Profile')),
+      );
+      return;
+    }
 
     final bool hasResult = result != null;
     final bool widgetStillMounted = mounted;
