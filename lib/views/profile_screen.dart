@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:sandwich_shop/views/app_styles.dart';
-import 'package:sandwich_shop/views/app_scaffold.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -11,73 +10,80 @@ class ProfileScreen extends StatefulWidget {
 
 class _ProfileScreenState extends State<ProfileScreen> {
   final TextEditingController _nameController = TextEditingController();
-  final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _phoneController = TextEditingController();
+  final TextEditingController _locationController = TextEditingController();
 
   @override
   void dispose() {
     _nameController.dispose();
-    _emailController.dispose();
-    _phoneController.dispose();
+    _locationController.dispose();
     super.dispose();
   }
 
   void _saveProfile() {
     final String name = _nameController.text.trim();
-    // final String email = _emailController.text.trim();
-    // final String phone = _phoneController.text.trim();
+    final String location = _locationController.text.trim();
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Saved profile for ${name.isEmpty ? 'User' : name}'),
-        duration: const Duration(seconds: 2),
-      ),
+    final bool nameIsNotEmpty = name.isNotEmpty;
+    final bool locationIsNotEmpty = location.isNotEmpty;
+    final bool bothFieldsFilled = nameIsNotEmpty && locationIsNotEmpty;
+
+    if (bothFieldsFilled) {
+      _returnProfileData(name, location);
+    } else {
+      _showValidationError();
+    }
+  }
+
+  void _returnProfileData(String name, String location) {
+    final Map<String, String> profileData = {
+      'name': name,
+      'location': location,
+    };
+    Navigator.pop(context, profileData);
+  }
+
+  void _showValidationError() {
+    const SnackBar validationSnackBar = SnackBar(
+      content: Text('Please fill in all fields'),
+      duration: Duration(seconds: 2),
     );
+    ScaffoldMessenger.of(context).showSnackBar(validationSnackBar);
   }
 
   @override
   Widget build(BuildContext context) {
-    return AppScaffold(
-      title: 'Profile',
-      body: Center(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              TextFormField(
-                controller: _nameController,
-                decoration: const InputDecoration(labelText: 'Full name'),
-                style: normalText,
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Profile', style: heading1),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            const Text('Enter your details:', style: heading2),
+            const SizedBox(height: 20),
+            TextField(
+              controller: _nameController,
+              decoration: const InputDecoration(
+                labelText: 'Your Name',
+                border: OutlineInputBorder(),
               ),
-              const SizedBox(height: 12),
-              TextFormField(
-                controller: _emailController,
-                decoration: const InputDecoration(labelText: 'Email'),
-                keyboardType: TextInputType.emailAddress,
-                style: normalText,
+            ),
+            const SizedBox(height: 16),
+            TextField(
+              controller: _locationController,
+              decoration: const InputDecoration(
+                labelText: 'Preferred Location',
+                border: OutlineInputBorder(),
               ),
-              const SizedBox(height: 12),
-              TextFormField(
-                controller: _phoneController,
-                decoration: const InputDecoration(labelText: 'Phone'),
-                keyboardType: TextInputType.phone,
-                style: normalText,
-              ),
-              const SizedBox(height: 20),
-              ElevatedButton.icon(
-                onPressed: _saveProfile,
-                icon: const Icon(Icons.save),
-                label: const Text('Save', style: TextStyle(fontSize: 16)),
-              ),
-              const SizedBox(height: 12),
-              const Text(
-                'Note: This demo screen does not persist data yet.',
-                style: normalText,
-                textAlign: TextAlign.center,
-              ),
-            ],
-          ),
+            ),
+            const SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: _saveProfile,
+              child: const Text('Save Profile'),
+            ),
+          ],
         ),
       ),
     );
