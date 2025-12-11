@@ -1,12 +1,22 @@
 import 'package:flutter/material.dart';
 import 'app_drawer.dart';
+import 'common_widgets.dart';
 
 class AppScaffold extends StatelessWidget {
   final String title;
   final Widget body;
   final Widget? leading;
+  final List<Widget>? actions;
+  final bool showCartAction;
 
-  const AppScaffold({super.key, required this.title, required this.body, this.leading});
+  const AppScaffold({
+    super.key,
+    required this.title,
+    required this.body,
+    this.leading,
+    this.actions,
+    this.showCartAction = true,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -14,12 +24,17 @@ class AppScaffold extends StatelessWidget {
     final bool wide = width >= 800;
 
     // For wide screens show a persistent side navigation, otherwise a Drawer
+    final PreferredSizeWidget appBar = buildCommonAppBar(
+      context: context,
+      title: title,
+      leading: wide ? leading : null,
+      actions: actions,
+      showCartAction: showCartAction,
+    );
+
     if (wide) {
       return Scaffold(
-        appBar: AppBar(
-          title: Text(title),
-          leading: leading,
-        ),
+        appBar: appBar,
         body: Row(
           children: [
             const SizedBox(
@@ -28,7 +43,6 @@ class AppScaffold extends StatelessWidget {
                 elevation: 2,
                 child: Column(
                   children: [
-                    // Reuse drawer content inside a container
                     Expanded(child: AppDrawer()),
                   ],
                 ),
@@ -42,10 +56,7 @@ class AppScaffold extends StatelessWidget {
 
     // Narrow screens: provide standard drawer
     return Scaffold(
-      appBar: AppBar(
-        title: Text(title),
-        leading: leading,
-      ),
+      appBar: appBar,
       drawer: const AppDrawer(),
       body: body,
     );
