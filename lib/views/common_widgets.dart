@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:sandwich_shop/models/cart.dart';
 import 'package:sandwich_shop/views/app_styles.dart';
 
-//Logo widget for app bars or headers.
+//Logo for headers.
 class AppLogo extends StatelessWidget {
   final double height;
 
@@ -84,7 +84,7 @@ class CartBadge extends StatelessWidget {
   }
 }
 
-//AppBar used across the app with optional cart badge.
+//AppBar used across the app
 PreferredSizeWidget buildCommonAppBar({
   required BuildContext context,
   required String title,
@@ -118,7 +118,7 @@ PreferredSizeWidget buildCommonAppBar({
   );
 }
 
-/// Consistent elevated button used across the app.
+//Button used across the app.
 class StyledButton extends StatelessWidget {
   final VoidCallback? onPressed;
   final IconData icon;

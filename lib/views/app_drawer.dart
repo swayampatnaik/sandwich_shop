@@ -10,10 +10,8 @@ class AppDrawer extends StatelessWidget {
   const AppDrawer({super.key, this.onNavigate});
 
   void _navigate(BuildContext context, String route) {
-    // Close the drawer first
-    Navigator.of(context).pop();
+    Navigator.of(context).pop(); // Close drawer
 
-    // If a caller supplied a custom handler, call it after the pop finishes.
     if (onNavigate != null) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         onNavigate!(route);
@@ -22,14 +20,15 @@ class AppDrawer extends StatelessWidget {
     }
 
     final String? current = ModalRoute.of(context)?.settings.name;
-    if (current == route) return;
 
-    // Schedule the navigation after the current frame so we don't attempt to use
-    // a context that may have been disposed when the Drawer closed.
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      // Use the root navigator to avoid using the Drawer/context that may be
-      // deactivated after Navigator.pop().
-      Navigator.of(context, rootNavigator: true).pushNamed(route);
+      if (current == route) {
+        // Pop current and push new to reload
+        Navigator.of(context, rootNavigator: true).pop();
+        Navigator.of(context, rootNavigator: true).pushNamed(route);
+      } else {
+        Navigator.of(context, rootNavigator: true).pushNamed(route);
+      }
     });
   }
 
