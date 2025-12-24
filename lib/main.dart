@@ -25,7 +25,7 @@ class App extends StatelessWidget {
         return Cart();
       },
       child: MaterialApp(
-        title: 'Sandwich Shop App',
+        title: 'Sandwich Shop',
         debugShowCheckedModeBanner: false,
         initialRoute: '/order',
         routes: {
